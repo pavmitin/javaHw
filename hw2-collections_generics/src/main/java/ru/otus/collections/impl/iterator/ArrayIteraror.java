@@ -1,12 +1,17 @@
-package ru.otus.collections.impl.arrayiterator;
+package ru.otus.collections.impl.iterator;
 
 import java.util.Iterator;
 
 public class ArrayIteraror<E> implements Iterator<E> {
+
+    public E[] getElements() {
+        return elements;
+    }
+
     private E[] elements;
     private int index = 0;
 
-    public ArrayIteraror( E[] elements){
+    public ArrayIteraror(E[] elements) {
         this.elements = elements;
     }
 
