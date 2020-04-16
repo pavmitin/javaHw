@@ -2,7 +2,7 @@ package ru.otus.collections.impl.iterator;
 
 import java.util.ListIterator;
 
-public class ListItrImpl<E> extends ArrayIteraror<E> implements ListIterator<E> {
+public class ListItrImpl<E> extends ArrayIterator<E> implements ListIterator<E> {
 
     public ListItrImpl(E[] elements) {
         super(elements);

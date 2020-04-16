@@ -1,6 +1,6 @@
 package ru.otus.collections.impl;
 
-import ru.otus.collections.impl.iterator.ArrayIteraror;
+import ru.otus.collections.impl.iterator.ArrayIterator;
 import ru.otus.collections.impl.iterator.ListItrImpl;
 
 import java.util.*;
@@ -31,7 +31,7 @@ public class DIYarrayList<T> implements List<T> {
 
     @Override
     public Iterator<T> iterator() {
-        return new ArrayIteraror<T>(elements);
+        return new ArrayIterator<T>(elements);
     }
 
     @Override

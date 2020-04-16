@@ -2,7 +2,7 @@ package ru.otus.collections.impl.iterator;
 
 import java.util.Iterator;
 
-public class ArrayIteraror<E> implements Iterator<E> {
+public class ArrayIterator<E> implements Iterator<E> {
 
     public E[] getElements() {
         return elements;
@@ -11,7 +11,7 @@ public class ArrayIteraror<E> implements Iterator<E> {
     private E[] elements;
     private int index = 0;
 
-    public ArrayIteraror(E[] elements) {
+    public ArrayIterator(E[] elements) {
         this.elements = elements;
     }
 
