@@ -9,19 +9,27 @@ import java.util.stream.IntStream;
 public class DIYarrayList<T> implements List<T> {
 
     private T[] elements;
+    private static final int DEFAULT_CAPACITY = 10;
+    private int capacity;
+    private int size;
 
     public DIYarrayList() {
-        this.elements = (T[]) new Object[0];
+        this.capacity = DEFAULT_CAPACITY;
+        this.elements = (T[]) new Object[capacity];
+    }
+    public DIYarrayList(int capacity) {
+        this.capacity = capacity;
+        this.elements = (T[]) new Object[capacity];
     }
 
     @Override
     public int size() {
-        return elements.length;
+        return size;
     }
 
     @Override
     public boolean isEmpty() {
-        return size() == 0;
+        return size == 0;
     }
 
     @Override
@@ -46,14 +54,10 @@ public class DIYarrayList<T> implements List<T> {
 
     @Override
     public boolean add(T t) {
-        try {
-            T[] array = elements;
-            elements = (T[]) new Object[size() + 1];
-            System.arraycopy(array, 0, elements, 0, array.length);
-            elements[elements.length - 1] = t;
-        } catch (ClassCastException ex) {
-            ex.printStackTrace();
+        if (size >= capacity) {
+            growArray();
         }
+        elements[size++] = t;
         return true;
     }
 
@@ -89,7 +93,8 @@ public class DIYarrayList<T> implements List<T> {
 
     @Override
     public void clear() {
-        IntStream.range(0, elements.length).forEach(i -> elements[i] = null);
+        IntStream.range(0, size).forEach(i -> elements[i] = null);
+        size = 0;
     }
 
     @Override
@@ -106,39 +111,41 @@ public class DIYarrayList<T> implements List<T> {
 
     @Override
     public void add(int index, T element) {
-        try {
-            T[] array = elements;
-            elements = (T[]) new Object[array.length + 1];
-            System.arraycopy(array, 0, elements, 0, index);
-            System.arraycopy(array, index, elements, index + 1, size() - index - 1);
-            elements[index] = element;
-        } catch (ClassCastException ex) {
-            ex.printStackTrace();
+        if (index < 0) {
+            return;
         }
+        if (size + 1 >= capacity) {
+            growArray();
+        }
+        if (index > size) {
+            index = size;
+        }
+        System.arraycopy(elements, index, elements, index + 1,
+                size - index);
+        elements[index] = element;
+        size++;
     }
 
     @Override
     public T remove(int index) {
         T oldValue = elements[index];
-        try {
-            T[] array = elements;
-            elements = (T[]) new Object[array.length - 1];
-            System.arraycopy(array, 0, elements, 0, index);
-            System.arraycopy(array, index + 1, elements, index, size() - index);
-        } catch (ClassCastException ex) {
-            ex.printStackTrace();
-        }
+        int numMoved = size - index - 1;
+        if (numMoved > 0)
+            System.arraycopy(elements, index + 1, elements, index,
+                    numMoved);
+        elements[--size] = null;
+
         return oldValue;
     }
 
     @Override
     public int indexOf(Object o) {
         if (o == null) {
-            for (int i = elements.length - 1; i >= 0; i--)
+            for (int i = size - 1; i >= 0; i--)
                 if (elements[i] == null)
                     return i;
         } else {
-            for (int i = 0; i < elements.length; i++)
+            for (int i = 0; i < size; i++)
                 if (o.equals(elements[i]))
                     return i;
         }
@@ -148,11 +155,11 @@ public class DIYarrayList<T> implements List<T> {
     @Override
     public int lastIndexOf(Object o) {
         if (o == null) {
-            for (int i = size() - 1; i >= 0; i--)
+            for (int i = size - 1; i >= 0; i--)
                 if (elements[i] == null)
                     return i;
         } else {
-            for (int i = size() - 1; i >= 0; i--)
+            for (int i = size - 1; i >= 0; i--)
                 if (o.equals(elements[i]))
                     return i;
         }
@@ -186,5 +193,10 @@ public class DIYarrayList<T> implements List<T> {
         }
         sb.append("}");
         return sb.toString();
+    }
+
+    private void growArray() {
+        capacity = capacity * 2;
+        elements = Arrays.copyOf(elements, capacity);
     }
 }

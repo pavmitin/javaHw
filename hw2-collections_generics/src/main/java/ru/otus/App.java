@@ -1,9 +1,9 @@
 package ru.otus;
 
-import org.checkerframework.checker.units.qual.A;
 import ru.otus.collections.impl.DIYarrayList;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class App {
     public static void main(String[] args) {
