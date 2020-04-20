@@ -9,4 +9,4 @@
 
 rootProject.name = 'javaHw'
 include 'hw01-gradle'
-
+include 'hw2-collections_generics'

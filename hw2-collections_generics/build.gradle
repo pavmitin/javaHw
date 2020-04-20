@@ -7,13 +7,8 @@ plugins {
 sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
 
-dependencies {
-    // This dependency is used by the application.
-    implementation 'com.google.guava:guava'
-}
-
 shadowJar {
-    archiveBaseName.set('gradleHelloWorld')
+    archiveBaseName.set('DIYarrayList')
     archiveVersion.set('0.1')
     archiveClassifier.set('')
     manifest {
