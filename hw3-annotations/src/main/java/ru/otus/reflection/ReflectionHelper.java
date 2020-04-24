@@ -1,11 +1,9 @@
 package ru.otus.reflection;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -13,33 +11,16 @@ public class ReflectionHelper {
     private ReflectionHelper() {
     }
 
-    public static Object getFieldValue(Object object, String name) {
+    public static void callMethod(Object object, Method method) throws InvocationTargetException {
         try {
-            Field field = object.getClass().getDeclaredField(name);
-            field.setAccessible(true);
-            return field.get(object);
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-
-    public static void setFieldValue(Object object, String name, Object value) {
-        try {
-            Field field = object.getClass().getDeclaredField(name);
-            field.setAccessible(true);
-            field.set(object, value);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static Object callMethod(Object object, String name, Object... args) {
-        try {
-            Method method = object.getClass().getDeclaredMethod(name, toClasses(args));
             method.setAccessible(true);
-            return method.invoke(object, args);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+            method.invoke(object);
+        } catch (IllegalAccessException e) {
+            System.err.println(e.getMessage());
+        } finally {
+            if (method != null && !method.isAccessible()) {
+                method.setAccessible(false);
+            }
         }
     }
 
@@ -61,7 +42,7 @@ public class ReflectionHelper {
     }
 
     public static <T> List<Method> getMethodsByAnnotation(Class<T> type, Class<? extends Annotation> annotationClass) {
-        Method[] allMethods = type.getDeclaredMethods();
+        Method[] allMethods = type.getMethods();
         return Arrays.stream(allMethods)
                 .filter(method -> method.isAnnotationPresent(annotationClass))
                 .collect(Collectors.toList());
