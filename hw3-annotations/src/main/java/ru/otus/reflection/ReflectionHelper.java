@@ -17,10 +17,6 @@ public class ReflectionHelper {
             method.invoke(object);
         } catch (IllegalAccessException e) {
             System.err.println(e.getMessage());
-        } finally {
-            if (method != null && !method.isAccessible()) {
-                method.setAccessible(false);
-            }
         }
     }
 

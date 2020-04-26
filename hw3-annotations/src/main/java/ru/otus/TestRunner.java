@@ -1,12 +1,10 @@
 package ru.otus;
 
-import com.sun.istack.internal.NotNull;
 import ru.otus.annotations.After;
 import ru.otus.annotations.Before;
 import ru.otus.annotations.Test;
 import ru.otus.reflection.ReflectionHelper;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 
@@ -24,11 +22,11 @@ public class TestRunner {
         run();
     }
 
-    public TestRunner(@NotNull String packageName) {
+    public TestRunner(String className) {
         try {
-            this.clazz = Class.forName(packageName);
+            this.clazz = Class.forName(className);
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException(format("Class with package %s doesn't exist!", packageName));
+            throw new RuntimeException(format("Class with name %s doesn't exist!", className));
         }
         run();
     }
@@ -45,10 +43,8 @@ public class TestRunner {
             try {
                 ReflectionHelper.callMethod(testObject, method);
                 successTestCount++;
-            } catch (InvocationTargetException e) {
-                System.out.println(format("Test %s failed:", method.getName())
-                        .concat(e.getTargetException().getMessage())
-                );
+            } catch (Exception e) {
+                e.printStackTrace();
                 failTestCount++;
             }
             callMethods(testObject, afterMethods);
@@ -62,7 +58,7 @@ public class TestRunner {
             for (Method m : methods) {
                 try {
                     ReflectionHelper.callMethod(object, m);
-                } catch (InvocationTargetException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
