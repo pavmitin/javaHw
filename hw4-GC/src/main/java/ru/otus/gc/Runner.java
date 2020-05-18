@@ -19,7 +19,7 @@ public class Runner {
     public static void main(String... args) throws Exception {
 
         System.out.println("Starting pid: " + ManagementFactory.getRuntimeMXBean().getName());
-        int elementsCount = 30000000;
+        int elementsCount = 1000000;
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
         ObjectName name = new ObjectName("ru.otus:type=Benchmark");
         Benchmark mbean = new Benchmark();
