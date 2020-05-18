@@ -11,4 +11,5 @@ rootProject.name = 'javaHw'
 include 'hw01-gradle'
 include 'hw2-collections_generics'
 include 'hw3-annotations'
+include 'hw4-GC'
 
