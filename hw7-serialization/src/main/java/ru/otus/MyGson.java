@@ -3,41 +3,23 @@ package ru.otus;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.Collection;
-import java.util.Objects;
 
 public class MyGson {
 
     public String toJson(Object object) throws IllegalAccessException {
         StringBuffer buffer = new StringBuffer();
+        String serializedObject;
         if (object == null) {
             buffer.append(serializeNull());
-        } else if (Objects.equals(serializeFieldObject(object), null)) {
-            Class<?> clazz = object.getClass();
-            Field[] fields = clazz.getDeclaredFields();
-            String key;
-            Object value;
-            buffer.append("{");
-            for (Field field : fields
-            ) {
-                field.setAccessible(true);
-                key = field.getName();
-                value = field.get(object);
-                if (value != null) {
-                    buffer.append(serializeFieldObject(key));
-                    buffer.append(":");
-                    buffer.append(serializeFieldObject(value));
-                    buffer.append(",");
-                }
-            }
-            if (buffer.toString().endsWith(",")) {
-                buffer.deleteCharAt(buffer.length() - 1).append("}");
-            } else buffer.append("}");
         } else {
-            buffer.append(serializeFieldObject(object));
+            serializedObject = serializeFieldObject(object);
+            if (serializedObject == null) {
+                serializeMixed(object, buffer);
+            } else {
+                buffer.append(serializedObject);
+            }
         }
-
         return String.valueOf(buffer);
-
     }
 
     private String serializeNull() {
@@ -83,7 +65,6 @@ public class MyGson {
         return builder.toString();
     }
 
-
     private String serializeFieldObject(Object object) throws IllegalAccessException {
         Class<?> clazz = object.getClass();
         if (object instanceof String || object instanceof Character) {
@@ -98,6 +79,30 @@ public class MyGson {
         } else {
             return null;
         }
+    }
+
+    private void serializeMixed(Object object, StringBuffer buffer) throws IllegalAccessException {
+        Class<?> clazz = object.getClass();
+        Field[] fields = clazz.getDeclaredFields();
+        String key;
+        Object value;
+        buffer.append("{");
+        for (Field field : fields
+        ) {
+            field.setAccessible(true);
+            key = field.getName();
+            value = field.get(object);
+            if (value != null) {
+                buffer.append(serializeFieldObject(key));
+                buffer.append(":");
+                buffer.append(serializeFieldObject(value));
+                buffer.append(",");
+            }
+        }
+        if (buffer.toString().endsWith(",")) {
+            buffer.deleteCharAt(buffer.length() - 1).append("}");
+        } else buffer.append("}");
+
     }
 
 }

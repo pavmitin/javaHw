@@ -1,9 +1,8 @@
 package ru.otus.objects;
 
-import java.io.Serializable;
 import java.util.List;
 
-public class Company implements Serializable {
+public class Company {
     private String name;
     private String address;
     private int companyId;
