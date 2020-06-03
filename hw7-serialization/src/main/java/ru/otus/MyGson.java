@@ -2,6 +2,7 @@ package ru.otus;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Collection;
 
 public class MyGson {
@@ -90,6 +91,8 @@ public class MyGson {
         for (Field field : fields
         ) {
             field.setAccessible(true);
+            if (Modifier.isTransient(field.getModifiers())) continue;
+            if (Modifier.isFinal(field.getModifiers())) continue;
             key = field.getName();
             value = field.get(object);
             if (value != null) {
