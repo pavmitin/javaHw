@@ -90,9 +90,8 @@ public class MyGson {
         buffer.append("{");
         for (Field field : fields
         ) {
-            field.setAccessible(true);
             if (Modifier.isTransient(field.getModifiers())) continue;
-            if (Modifier.isFinal(field.getModifiers())) continue;
+            field.setAccessible(true);
             key = field.getName();
             value = field.get(object);
             if (value != null) {
