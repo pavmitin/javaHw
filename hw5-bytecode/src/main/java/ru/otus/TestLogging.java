@@ -1,7 +1,5 @@
 package ru.otus;
 
-import ru.otus.annotations.Log;
-
 public interface TestLogging {
     void calculation(int param);
 
