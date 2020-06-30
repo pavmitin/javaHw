@@ -1,31 +1,37 @@
 package ru.otus;
 
-import java.util.Comparator;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 public class AtmImpl implements Atm {
 
-    private final Map<Banknote, Integer> atmCash;
+    private Map<Integer, BanknoteCell> atmCash = new TreeMap<>(
+            Comparator.comparing(Integer::intValue).reversed()
+    );
 
-    public AtmImpl(Map<Banknote, Integer> cash) {
-        this.atmCash = new TreeMap<>() {{
-            putAll(cash);
-        }};
-    }
-
-    public Map<Banknote, Integer> getAtmCash() {
-        return atmCash;
-    }
-
-    @Override
-    public void acceptBanknotes(Map<Banknote, Integer> cash) {
-        cash.forEach((key, value) -> atmCash.put(key, atmCash.get(key) + value));
+    public AtmImpl() {
+        Arrays.stream(Banknote.values()).forEach(
+                banknote ->
+                        atmCash.put(
+                                banknote.getNominal(),
+                                new BanknoteCell(banknote)
+                        )
+        );
     }
 
     @Override
-    public Map<Banknote, Integer> giveOutAmountWithMinBanknotes(int amount) {
-        Map<Banknote, Integer> needCash = new TreeMap<>();
+    public void acceptBanknotes(List<Banknote> banknotes) {
+        banknotes.forEach(
+                banknote ->
+                        atmCash
+                                .get(banknote.getNominal())
+                                .addBanknotes(banknote)
+        );
+    }
+
+    @Override
+    public List<Banknote> giveOutAmountWithMinBanknotes(int amount) {
+
+        List<Banknote> needCash = new ArrayList<>();
         if (amount < 0) {
             throw new RuntimeException("Запрошенная сумма не может быть отрицательной!");
         }
@@ -35,43 +41,36 @@ public class AtmImpl implements Atm {
         if (amount % getExistMinNominal() > 0) {
             throw new RuntimeException("Невозможно выдать запрошенную сумму!");
         }
-        for (Map.Entry<Banknote, Integer> entry : atmCash.entrySet()) {
-            int nominalCounter = amount / entry.getKey().getNominal();
-            if (entry.getValue() < nominalCounter) {
-                nominalCounter = entry.getValue();
-            }
-            amount = amount - nominalCounter * entry.getKey().getNominal();
-            if (nominalCounter != 0) {
-                needCash.put(entry.getKey(), nominalCounter);
+        for (BanknoteCell banknoteCell : atmCash.values()) {
+            if (banknoteCell.countBanknotes() > 0) {
+                int nominalCounter = amount / banknoteCell.getBanknote().getNominal();
+                if (banknoteCell.countBanknotes() < nominalCounter) {
+                    nominalCounter = banknoteCell.countBanknotes();
+                }
+                amount = amount - nominalCounter * banknoteCell.getBanknote().getNominal();
+                if (nominalCounter != 0) {
+                    needCash.addAll(banknoteCell.removeBanknotes(nominalCounter));
+                }
             }
         }
-        needCash.forEach((key, value) -> atmCash.put(key, atmCash.get(key) - value));
-
-        printCash(needCash);
-
         return needCash;
     }
 
     private Integer getExistMinNominal() {
-        return atmCash.entrySet().stream()
-                .filter(entry -> entry.getValue() > 0)
-                .map(Map.Entry::getKey)
-                .min(Comparator
-                        .comparing(
-                                Banknote::getNominal
-                        )
+        return atmCash.values().stream()
+                .filter(banknoteCell -> banknoteCell.countBanknotes() > 0)
+                .map(banknoteCell -> banknoteCell.getBanknote().getNominal())
+                .min(
+                        Comparator.comparing(Integer::intValue)
                 )
-                .get()
-                .getNominal();
+                .get();
     }
 
-    @Override
     public Integer getBalance() {
-        return atmCash.entrySet().stream().mapToInt(entry -> entry.getValue() * entry.getKey().getNominal()).sum();
+        return atmCash.entrySet().stream().mapToInt(entry -> entry.getValue().countBanknotes() * entry.getKey()).sum();
     }
 
-    private void printCash(Map<Banknote, Integer> cash) {
-        System.out.println("Выдано:");
-        cash.forEach((key, value) -> System.out.println(value + " банкнот номиналом " + key.getNominal()));
+    public Map<Integer, BanknoteCell> getAtmCash() {
+        return atmCash;
     }
 }

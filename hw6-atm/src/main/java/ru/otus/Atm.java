@@ -1,12 +1,12 @@
 package ru.otus;
 
-import java.util.Map;
+import java.util.List;
 
 public interface Atm {
 
-    void acceptBanknotes(Map<Banknote, Integer> cash);
+    void acceptBanknotes(List<Banknote> cash);
 
-    Map<Banknote, Integer> giveOutAmountWithMinBanknotes(int amount);
+    List<Banknote> giveOutAmountWithMinBanknotes(int amount);
 
     Integer getBalance();
 }

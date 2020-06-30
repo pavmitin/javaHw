@@ -1,59 +1,72 @@
 package ru.otus;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Arrays;
+import java.util.Collections;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 class AtmImplTest {
     private AtmImpl atm;
 
+    @BeforeEach
+    void setUp() {
+        atm = new AtmImpl();
+    }
+
     @Test
     void acceptBanknotes() {
-        Map<Banknote, Integer> cash = new HashMap<>();
-        cash.put(Banknote.FIVE_THOUSAND, 5);
-        cash.put(Banknote.FIFTY, 100);
-        atm = new AtmImpl(cash);
+        var cash = Arrays.asList(
+                Banknote.THOUSAND,
+                Banknote.HUNDRED,
+                Banknote.FIFTY,
+                Banknote.FIFTY
+        );
         atm.acceptBanknotes(cash);
-        Integer expectedFifty = atm.getAtmCash().get(Banknote.FIFTY);
-        Integer expectedFiveThusand = atm.getAtmCash().get(Banknote.FIVE_THOUSAND);
-        Integer actualFifty = 200;
-        Integer actualFiveThusand = 10;
-        assertEquals(expectedFifty, actualFifty);
-        assertEquals(expectedFiveThusand, actualFiveThusand);
+        assertEquals(atm.getAtmCash().entrySet().stream().filter(entry -> entry.getValue().countBanknotes() > 0).count() , 3);
+        assertTrue(
+                atm.getAtmCash().entrySet().stream()
+                        .filter(entry -> entry.getValue().countBanknotes() > 0)
+                        .allMatch(
+                                entry -> cash.containsAll(entry.getValue().getBanknotes())
+                        )
+        );
     }
 
     @Test
     void giveOutAmountWithMinBanknotes() {
-        Map<Banknote, Integer> cash = new HashMap<>();
-        cash.put(Banknote.FIVE_THOUSAND, 5);
-        cash.put(Banknote.FIFTY, 100);
-        cash.put(Banknote.FIVE_HUNDRED, 10);
-        atm = new AtmImpl(cash);
+        var cash = Arrays.asList(
+                Banknote.THOUSAND,
+                Banknote.HUNDRED,
+                Banknote.FIFTY,
+                Banknote.FIFTY
+        );
+        atm.acceptBanknotes(cash);
         assertThrows(RuntimeException.class, () -> atm.giveOutAmountWithMinBanknotes(1), "Невозможно выдать запрошенную сумму!");
         assertThrows(RuntimeException.class, () -> atm.giveOutAmountWithMinBanknotes(-3), "Запрошенная сумма не может быть отрицательной!");
         assertThrows(RuntimeException.class, () -> atm.giveOutAmountWithMinBanknotes(51), "Невозможно выдать запрошенную сумму!");
-        assertThrows(RuntimeException.class, () -> atm.giveOutAmountWithMinBanknotes(35050), "Недостаточно средств в банкомате!");
-        Map<Banknote, Integer> actualMap = new HashMap<>() {{
-            put(Banknote.FIVE_HUNDRED, 2);
-        }};
-        assertEquals(atm.giveOutAmountWithMinBanknotes(1000), actualMap);
+        assertThrows(RuntimeException.class, () -> atm.giveOutAmountWithMinBanknotes(1300), "Недостаточно средств в банкомате!");
+        assertEquals(atm.giveOutAmountWithMinBanknotes(1200), cash);
+        atm.acceptBanknotes(cash);
+        assertEquals(atm.giveOutAmountWithMinBanknotes(100), Collections.singletonList(Banknote.HUNDRED));
     }
 
     @Test
     void getBalance() {
-        Map<Banknote, Integer> cash = new HashMap<>();
-        cash.put(Banknote.FIVE_THOUSAND, 5);
-        cash.put(Banknote.FIFTY, 100);
-        cash.put(Banknote.FIVE_HUNDRED, 10);
-        atm = new AtmImpl(cash);
-        atm.giveOutAmountWithMinBanknotes(35000);
+        var cash = Arrays.asList(
+                Banknote.THOUSAND,
+                Banknote.HUNDRED,
+                Banknote.FIFTY,
+                Banknote.FIFTY
+        );
+        atm.acceptBanknotes(cash);
+        atm.getBalance();
         Integer expected = atm.getBalance();
-        Integer actual = 0;
+        Integer actual = 1200;
         assertEquals(expected, actual);
     }
+
 }
