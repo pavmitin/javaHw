@@ -27,13 +27,6 @@ class AtmImplTest {
         );
         atm.acceptBanknotes(cash);
         assertEquals(atm.getAtmCash().entrySet().stream().filter(entry -> entry.getValue().countBanknotes() > 0).count() , 3);
-        assertTrue(
-                atm.getAtmCash().entrySet().stream()
-                        .filter(entry -> entry.getValue().countBanknotes() > 0)
-                        .allMatch(
-                                entry -> cash.containsAll(entry.getValue().getBanknotes())
-                        )
-        );
     }
 
     @Test

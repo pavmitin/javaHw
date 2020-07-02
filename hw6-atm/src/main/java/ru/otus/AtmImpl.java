@@ -4,16 +4,16 @@ import java.util.*;
 
 public class AtmImpl implements Atm {
 
-    private Map<Integer, BanknoteCell> atmCash = new TreeMap<>(
-            Comparator.comparing(Integer::intValue).reversed()
+    private Map<Banknote, BanknoteCellImpl> atmCash = new TreeMap<>(
+            Comparator.comparing(Banknote::getNominal).reversed()
     );
 
     public AtmImpl() {
         Arrays.stream(Banknote.values()).forEach(
                 banknote ->
                         atmCash.put(
-                                banknote.getNominal(),
-                                new BanknoteCell(banknote)
+                                banknote,
+                                new BanknoteCellImpl(banknote)
                         )
         );
     }
@@ -23,7 +23,7 @@ public class AtmImpl implements Atm {
         banknotes.forEach(
                 banknote ->
                         atmCash
-                                .get(banknote.getNominal())
+                                .get(banknote)
                                 .addBanknotes(banknote)
         );
     }
@@ -41,7 +41,7 @@ public class AtmImpl implements Atm {
         if (amount % getExistMinNominal() > 0) {
             throw new RuntimeException("Невозможно выдать запрошенную сумму!");
         }
-        for (BanknoteCell banknoteCell : atmCash.values()) {
+        for (BanknoteCellImpl banknoteCell : atmCash.values()) {
             if (banknoteCell.countBanknotes() > 0) {
                 int nominalCounter = amount / banknoteCell.getBanknote().getNominal();
                 if (banknoteCell.countBanknotes() < nominalCounter) {
@@ -67,10 +67,15 @@ public class AtmImpl implements Atm {
     }
 
     public Integer getBalance() {
-        return atmCash.entrySet().stream().mapToInt(entry -> entry.getValue().countBanknotes() * entry.getKey()).sum();
+        return atmCash.entrySet().stream()
+                .mapToInt(
+                        entry ->
+                                entry.getValue().countBanknotes() * entry.getKey().getNominal()
+                )
+                .sum();
     }
 
-    public Map<Integer, BanknoteCell> getAtmCash() {
+    public Map<Banknote, BanknoteCellImpl> getAtmCash() {
         return atmCash;
     }
 }
