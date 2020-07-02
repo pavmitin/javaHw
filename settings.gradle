@@ -14,4 +14,5 @@ include 'hw3-annotations'
 include 'hw4-GC'
 include 'hw7-serialization'
 include 'hw5-bytecode'
+include 'hw6-atm'
 
