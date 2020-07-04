@@ -4,7 +4,7 @@ import java.util.*;
 
 public class AtmImpl implements Atm {
 
-    private Map<Banknote, BanknoteCellImpl> atmCash = new TreeMap<>(
+    private final Map<Banknote, BanknoteCellImpl> atmCash = new TreeMap<>(
             Comparator.comparing(Banknote::getNominal).reversed()
     );
 

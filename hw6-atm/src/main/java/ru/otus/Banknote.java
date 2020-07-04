@@ -9,7 +9,7 @@ public enum Banknote {
     FIFTY(50),
     TEN(10);
 
-    private int nominal;
+    private final int nominal;
 
     Banknote(int nominal) {
         this.nominal = nominal;
